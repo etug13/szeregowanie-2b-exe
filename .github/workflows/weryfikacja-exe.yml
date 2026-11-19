@@ -52,21 +52,21 @@ jobs:
               var p = Process.Start(new ProcessStartInfo(@"' + "$env:GITHUB_WORKSPACE\exe\159876.exe" + '", "\"" + a[0] + "\" \"" + a[1] + "\" 0.5") { UseShellExecute = false });
               p.WaitForExit(); return p.ExitCode; } }'
             Write-Host '::notice::start'
-            Add-Type -TypeDefinition $src -OutputType ConsoleApplication -OutputAssembly lab\programy\wolny.exe
-            function Last { $d = Get-ChildItem lab\wyniki -Directory | Sort-Object Name | Select-Object -Last 1
+            Add-Type -TypeDefinition $src -OutputType ConsoleApplication -OutputAssembly "$env:GITHUB_WORKSPACE\lab\programy\wolny.exe"
+            function Last { $d = Get-ChildItem "$env:GITHUB_WORKSPACE\lab\wyniki" -Directory | Sort-Object Name | Select-Object -Last 1
               Get-ChildItem $d.FullName -Recurse -Filter DO-ARKUSZA.csv | ForEach-Object { $p = $_.Directory.Name; Import-Csv $_.FullName -Delimiter ';' | Select-Object @{n='program';e={$p}},* } }
             # 1) wybiorczo: jeden program po numerze, dwie instancje
-            & .\lab\START.ps1 -BezPauzy -Programy 1 -Rozmiary 50,100
+            & "$env:GITHUB_WORKSPACE\lab\START.ps1" -BezPauzy -Programy 1 -Rozmiary 50,100
             $r = @(Last); $r | Format-Table -AutoSize
             Write-Host "::notice::krok1 LASTEXITCODE=$LASTEXITCODE $(($r | ConvertTo-Json -Compress) -replace '%','%25')"
             if ($r.Count -ne 2 -or @($r | Where-Object { $_.program -ne '159876' -or $_.komentarz -ne 'OK' }).Count) { throw 'wybiorczy: zly raport' }
             # 2) ucinanie: wolny.exe zabity
-            & .\lab\START.ps1 -BezPauzy -Programy wolny.exe -Rozmiary 50
+            & "$env:GITHUB_WORKSPACE\lab\START.ps1" -BezPauzy -Programy wolny.exe -Rozmiary 50
             $r = @(Last); $r | Format-Table -AutoSize
             Write-Host "::notice::krok2 LASTEXITCODE=$LASTEXITCODE $(($r | ConvertTo-Json -Compress) -replace '%','%25')"
             if ($r.Count -ne 1 -or $r[0].czas -notlike 'CZAS =*' -or $r[0].kryterium -match '^\d+$') { throw 'ucinanie: zly raport' }
             # 3) bez ucinania: prawdziwy czas > limit, wynik zweryfikowany
-            & .\lab\START.ps1 -BezPauzy -BezUcinania -Programy wolny -Rozmiary 50,100
+            & "$env:GITHUB_WORKSPACE\lab\START.ps1" -BezPauzy -BezUcinania -Programy wolny -Rozmiary 50,100
             $r = @(Last); $r | Format-Table -AutoSize
             Write-Host "::notice::krok3 LASTEXITCODE=$LASTEXITCODE $(($r | ConvertTo-Json -Compress) -replace '%','%25')"
             foreach ($x in $r) {

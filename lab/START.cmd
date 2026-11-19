@@ -1,0 +1,5 @@
+@echo off
+cd /d "%~dp0"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0START.ps1"
+if errorlevel 1 echo BLAD. Przeczytaj komunikat powyzej.
+pause

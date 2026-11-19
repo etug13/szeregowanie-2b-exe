@@ -23,3 +23,43 @@ jobs:
           name: algorytm-windows-x64
           path: dist/algorytm.exe
           if-no-files-found: error
+  lab-kit:
+    needs: build
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: algorytm-windows-x64
+          path: exe
+      - name: Zloz paczke laboratoryjna
+        shell: powershell
+        run: |
+          Copy-Item exe\algorytm.exe lab\programy\algorytm.exe
+          Copy-Item exe\algorytm.exe lab\do-udostepnienia\algorytm.exe
+          python scripts/check_exe.py --make lab/moje-instancje
+      - name: Test paczki w Windows PowerShell 5.1 (START -BezPauzy, sztuczne instancje)
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          & .\lab\START.ps1 -BezPauzy
+          $csv = Get-ChildItem lab\wyniki -Recurse -Filter DO-ARKUSZA.csv | Select-Object -First 1
+          $rows = @(Import-Csv $csv.FullName -Delimiter ';')
+          $rows | Format-Table -AutoSize
+          if ($rows.Count -ne 10) { throw "Oczekiwano 10 wierszy, jest $($rows.Count)" }
+          $bad = @($rows | Where-Object { $_.komentarz -ne 'OK' })
+          if ($bad.Count -gt 0) { throw "Bledy w raporcie: $($bad | ConvertTo-Json -Compress)" }
+      - name: Wyczysc dane testowe
+        shell: powershell
+        run: |
+          Remove-Item lab\wyniki -Recurse -Force
+          Remove-Item lab\moje-instancje\in_test_*.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: laboratorium-2b
+          path: lab
+          if-no-files-found: error

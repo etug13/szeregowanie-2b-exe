@@ -1,0 +1,39 @@
+LABORATORIUM - ZADANIE 2B - TESTY ALGORYTMOW (Windows, bez Pythona)
+
+ZAWARTOSC
+programy\          EXE do przetestowania (algorytm.exe juz tu jest)
+do-udostepnienia\  Twoj EXE dla grupy (algorytm.exe; zmien nazwe wg konwencji grupy)
+moje-instancje\    Wloz tu DOKLADNIE swoje 10 instancji in_*_50..500.txt
+narzedzia\         testuj.ps1 (czas, limit n/20), weryfikuj.ps1 (poprawnosc, model A)
+START.cmd          Uruchamia wszystko
+
+KROKI
+1. Rozpakuj CALY ZIP na dysk lokalny, np. C:\testy (nie uruchamiaj wewnatrz ZIP).
+2. Skopiuj swoje 10 instancji do moje-instancje.
+3. Wloz programy grupy (EXE) do programy. Zachowaj oryginalne nazwy.
+4. Dwuklik START.cmd. Najpierw autotest weryfikatora, potem kazdy EXE
+   na Twoich 10 instancjach z limitem n/20 s (2.5, 5, ..., 25 s).
+5. Po kazdym programie wpisz wyniki do arkusza (wiersze Twoich instancji,
+   kolejnosc n=50,100,...,500), potem Enter. Q konczy serie.
+
+WYNIKI: wyniki\DATA-CZAS\<program>\
+- KRYTERIUM.txt / CZASY.txt - kolumny do wklejenia (same wartosci, zachowaj formatowanie)
+- DO-ARKUSZA.csv - instancja, kryterium lub BLAD, czas, komentarz
+- out_*.txt, *.log, *.err - rozwiazania i logi
+"CZAS =X" = przekroczony limit. BLAD = rozwiazanie odrzucone przez weryfikator (komentarz w CSV).
+
+JEDEN PROGRAM RECZNIE (PowerShell w folderze paczki)
+powershell -NoProfile -ExecutionPolicy Bypass -File .\narzedzia\testuj.ps1 -Program .\programy\algorytm.exe -Instancje .\moje-instancje -Wyniki .\wyniki-reczne
+
+WERYFIKACJA DOWOLNEGO PLIKU
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& .\narzedzia\weryfikuj.ps1 -Instancja .\moje-instancje\in_X_50.txt -Rozwiazanie .\wynik.txt"
+(opcjonalnie -Model B)
+
+ALGORYTM RECZNIE
+.\programy\algorytm.exe .\moje-instancje\in_X_50.txt .\wynik.txt 2.5
+Trzeci argument (limit w s) opcjonalny, domyslnie n/20.
+
+UWAGI
+- Jeden program naraz, zamknij zbedne aplikacje (pomiar czasu).
+- Pierwsze uruchomienie EXE moze byc wolniejsze (antywirus skanuje plik).
+  Jesli algorytm.exe przekracza limit na lab, zglos - EXE zostawia ~40% zapasu.

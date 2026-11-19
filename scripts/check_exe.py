@@ -54,4 +54,9 @@ def main(exe):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1])
+    if sys.argv[1] == '--make':          # --make KATALOG: 10 sztucznych instancji n=50..500
+        out = Path(sys.argv[2]); out.mkdir(parents=True, exist_ok=True)
+        for n in range(50, 501, 50):
+            (out / f'in_test_{n}.txt').write_text(make(n, 1000 + n)[0])
+    else:
+        main(sys.argv[1])

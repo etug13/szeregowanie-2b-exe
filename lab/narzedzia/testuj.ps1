@@ -53,6 +53,8 @@ foreach ($inputFile in $inputs) {
             try {
                 $ErrorActionPreference = 'Continue'
                 & taskkill.exe /PID $process.Id /T /F 2>&1 | Out-Null
+                # Kod taskkill nie jest wynikiem testu (nie psuj kodu wyjscia skryptu).
+                $global:LASTEXITCODE = 0
             } finally { $ErrorActionPreference = $savedPreference }
             $status = if ($BezUcinania) { "CZAS (przerwany awaryjnie)" } else { "CZAS" }
         } else {

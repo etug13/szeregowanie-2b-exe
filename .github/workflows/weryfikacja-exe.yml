@@ -40,3 +40,32 @@ jobs:
           if ($rows.Count -ne 10) { throw "Oczekiwano 10 wierszy, jest $($rows.Count)" }
           $bad = @($rows | Where-Object { $_.komentarz -ne 'OK' })
           if ($bad.Count -gt 0) { throw "Bledy w raporcie: $($bad | ConvertTo-Json -Compress)" }
+      - name: Tryb wybiorczy i bez ucinania (wolny.exe = sen 1.4 x limit + algorytm)
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $src = 'using System; using System.Diagnostics; using System.Threading; using System.Globalization;
+          public static class W { public static int Main(string[] a) {
+            double lim = double.Parse(a[2], CultureInfo.InvariantCulture);
+            Thread.Sleep((int)(lim * 1400));
+            var p = Process.Start(new ProcessStartInfo(@"' + "$env:GITHUB_WORKSPACE\exe\159876.exe" + '", "\"" + a[0] + "\" \"" + a[1] + "\" 0.5") { UseShellExecute = false });
+            p.WaitForExit(); return p.ExitCode; } }'
+          Add-Type -TypeDefinition $src -OutputType ConsoleApplication -OutputAssembly lab\programy\wolny.exe
+          function Last { $d = Get-ChildItem lab\wyniki -Directory | Sort-Object Name | Select-Object -Last 1
+            Get-ChildItem $d.FullName -Recurse -Filter DO-ARKUSZA.csv | ForEach-Object { $p = $_.Directory.Name; Import-Csv $_.FullName -Delimiter ';' | Select-Object @{n='program';e={$p}},* } }
+          # 1) wybiorczo: jeden program po numerze, dwie instancje
+          & .\lab\START.ps1 -BezPauzy -Programy 1 -Rozmiary 50,100
+          $r = @(Last); $r | Format-Table -AutoSize
+          if ($r.Count -ne 2 -or @($r | Where-Object { $_.program -ne '159876' -or $_.komentarz -ne 'OK' }).Count) { throw 'wybiorczy: zly raport' }
+          # 2) ucinanie: wolny.exe zabity
+          & .\lab\START.ps1 -BezPauzy -Programy wolny.exe -Rozmiary 50
+          $r = @(Last); $r | Format-Table -AutoSize
+          if ($r.Count -ne 1 -or $r[0].czas -notlike 'CZAS =*' -or $r[0].kryterium -match '^\d+$') { throw 'ucinanie: zly raport' }
+          # 3) bez ucinania: prawdziwy czas > limit, wynik zweryfikowany
+          & .\lab\START.ps1 -BezPauzy -BezUcinania -Programy wolny -Rozmiary 50,100
+          $r = @(Last); $r | Format-Table -AutoSize
+          foreach ($x in $r) {
+            $t = [double]($x.czas -replace '^CZAS =','')
+            if ($x.czas -notlike 'CZAS =*' -or $t -lt 3.4 -or $x.kryterium -notmatch '^\d+$' -or $x.komentarz -ne 'CZAS; wynik poprawny') { throw "bez ucinania: zly raport $($x | ConvertTo-Json -Compress)" }
+          }
+          if ($r.Count -ne 2) { throw 'bez ucinania: oczekiwano 2 wierszy' }

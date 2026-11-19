@@ -22,6 +22,16 @@ WYNIKI: wyniki\DATA-CZAS\<program>\
 - out_*.txt, *.log, *.err - rozwiazania i logi
 "CZAS =X" = przekroczony limit. BLAD = rozwiazanie odrzucone przez weryfikator (komentarz w CSV).
 
+WYBIORCZE URUCHOMIENIE / BEZ UCINANIA (pytania na starcie START.cmd)
+- "Ktore programy?"  Enter = wszystkie, albo numery z listy lub nazwy, np. 2,5
+- "Ktore instancje?" Enter = wszystkie, albo n, np. 300,500 (powtorka bledow)
+- "Tryb?"            Enter = ucinanie po n/20 (program zabity, kryterium BLAD)
+                     B = bez ucinania: program konczy sam (awaryjnie po 10 x n/20),
+                     w CZASY.txt prawdziwy czas "CZAS =X", kryterium sprawdzone
+                     weryfikatorem (komentarz "CZAS; wynik poprawny").
+Bez pytan (PowerShell w folderze paczki):
+powershell -NoProfile -ExecutionPolicy Bypass -File .\START.ps1 -BezPauzy -BezUcinania -Programy 160329.exe -Rozmiary 300,500
+
 JEDEN PROGRAM RECZNIE (PowerShell w folderze paczki)
 powershell -NoProfile -ExecutionPolicy Bypass -File .\narzedzia\testuj.ps1 -Program .\programy\algorytm.exe -Instancje .\moje-instancje -Wyniki .\wyniki-reczne
 

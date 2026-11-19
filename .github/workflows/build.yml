@@ -47,7 +47,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           & .\lab\START.ps1 -BezPauzy
-          $csv = Get-ChildItem lab\wyniki -Recurse -Filter DO-ARKUSZA.csv | Select-Object -First 1
+          $csv = Get-ChildItem "$env:GITHUB_WORKSPACE\lab\wyniki" -Recurse -Filter DO-ARKUSZA.csv | Select-Object -First 1
           $rows = @(Import-Csv $csv.FullName -Delimiter ';')
           $rows | Format-Table -AutoSize
           if ($rows.Count -ne 10) { throw "Oczekiwano 10 wierszy, jest $($rows.Count)" }

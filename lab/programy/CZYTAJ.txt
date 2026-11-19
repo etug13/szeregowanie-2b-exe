@@ -1,0 +1,1 @@
+Programy EXE grupy do testu (algorytm.exe jest juz w paczce z release).

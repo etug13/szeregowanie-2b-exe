@@ -1,39 +1,37 @@
-LABORATORIUM - ZADANIE 2B - TESTY ALGORYTMOW (Windows, bez Pythona)
+ZADANIE 2B - TESTY NA LABIE (Windows, bez Pythona)
 
-ZAWARTOSC
-programy\          EXE do przetestowania (algorytm.exe juz tu jest)
-do-udostepnienia\  Twoj EXE dla grupy (algorytm.exe; zmien nazwe wg konwencji grupy)
-moje-instancje\    Wloz tu DOKLADNIE swoje 10 instancji in_*_50..500.txt
-narzedzia\         testuj.ps1 (czas, limit n/20), weryfikuj.ps1 (poprawnosc, model A)
-START.cmd          Uruchamia wszystko
+W PACZCE
+  czas.exe          weryfikator czasu (limit n/20 s)
+  weryfikator.exe   weryfikator poprawnosci (model A)
+  TESTUJ.cmd        petla po wszystkich programach z programy\
+  algorytm.exe      moj algorytm (dla grupy: zmien nazwe na numer indeksu)
+  programy\         tu EXE grupy
+  moje-instancje\   tu moje 10 instancji in_*_50..500.txt
 
-KROKI
-1. Rozpakuj CALY ZIP na dysk lokalny, np. C:\testy (nie uruchamiaj wewnatrz ZIP).
-2. Skopiuj swoje 10 instancji do moje-instancje.
-3. Wloz programy grupy (EXE) do programy. Zachowaj oryginalne nazwy.
-4. Dwuklik START.cmd. Najpierw autotest weryfikatora, potem kazdy EXE
-   na Twoich 10 instancjach z limitem n/20 s (2.5, 5, ..., 25 s).
-5. Po kazdym programie wpisz wyniki do arkusza (wiersze Twoich instancji,
-   kolejnosc n=50,100,...,500), potem Enter. Q konczy serie.
+Rozpakuj CALY ZIP np. do C:\testy, otworz tam cmd (w pasku adresu
+Eksploratora wpisz cmd i Enter).
 
-WYNIKI: wyniki\DATA-CZAS\<program>\
-- KRYTERIUM.txt / CZASY.txt - kolumny do wklejenia (same wartosci, zachowaj formatowanie)
-- DO-ARKUSZA.csv - instancja, kryterium lub BLAD, czas, komentarz
-- out_*.txt, *.log, *.err - rozwiazania i logi
-"CZAS =X" = przekroczony limit. BLAD = rozwiazanie odrzucone przez weryfikator (komentarz w CSV).
+SERIA DLA JEDNEGO PROGRAMU (2 komendy, wynik wypisuje sie wiersz po wierszu)
+  czas.exe programy\160111.exe moje-instancje wyniki\160111
+  weryfikator.exe moje-instancje wyniki\160111
 
-JEDEN PROGRAM RECZNIE (PowerShell w folderze paczki)
-powershell -NoProfile -ExecutionPolicy Bypass -File .\narzedzia\testuj.ps1 -Program .\programy\algorytm.exe -Instancje .\moje-instancje -Wyniki .\wyniki-reczne
+  -> wyniki\160111\CZASY.txt      kolumna "czas" do arkusza (CZAS =X = przekroczony)
+  -> wyniki\160111\KRYTERIUM.txt  kolumna "kryterium" (BŁĄD = odrzucone)
+  Kolejnosc wierszy: n = 50, 100, ..., 500.
 
-WERYFIKACJA DOWOLNEGO PLIKU
-powershell -NoProfile -ExecutionPolicy Bypass -Command "& .\narzedzia\weryfikuj.ps1 -Instancja .\moje-instancje\in_X_50.txt -Rozwiazanie .\wynik.txt"
-(opcjonalnie -Model B)
+WSZYSTKIE PROGRAMY NARAZ
+  Dwuklik TESTUJ.cmd - dla kazdego EXE z programy\ robi czas.exe
+  i weryfikator.exe na moich instancjach (wyniki\<program>\).
 
-ALGORYTM RECZNIE
-.\programy\algorytm.exe .\moje-instancje\in_X_50.txt .\wynik.txt 2.5
-Trzeci argument (limit w s) opcjonalny, domyslnie n/20.
+POJEDYNCZE PLIKI
+  czas.exe programy\160111.exe moje-instancje\in_159876_50.txt wynik.txt 2.5
+  weryfikator.exe moje-instancje\in_159876_50.txt wynik.txt
+  weryfikator.exe --autotest          (test samego weryfikatora)
+  weryfikator.exe ... --model B       (inny model czyszczenia)
 
 UWAGI
-- Jeden program naraz, zamknij zbedne aplikacje (pomiar czasu).
-- Pierwsze uruchomienie EXE moze byc wolniejsze (antywirus skanuje plik).
-  Jesli algorytm.exe przekracza limit na lab, zglos - EXE zostawia ~40% zapasu.
+  - Jeden program naraz, zamknij zbedne aplikacje.
+  - Pierwsze uruchomienie EXE bywa wolniejsze (antywirus) - w razie
+    "CZAS =" przy pierwszej instancji powtorz serie.
+  - Weryfikator szuka out_<autor>_<n>.txt albo out_<autor>_<program>_<n>.txt,
+    wiec sprawdzi tez rozwiazania zrobione recznie lub przez innych.

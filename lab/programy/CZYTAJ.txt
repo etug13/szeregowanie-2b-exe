@@ -1,1 +1,1 @@
-Programy EXE grupy do testu (algorytm.exe jest juz w paczce z release).
+Wloz tu EXE grupy (zachowaj oryginalne nazwy, np. 160111.exe).
